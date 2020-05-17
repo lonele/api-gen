@@ -1,0 +1,7 @@
+//测试保存提交
+@hostname=localhost
+@port=8080//端口号
+@host={{hostname}}:{{port}}
+//注意：不能有空格出现
+GET  http://localhost:8880/sign HTTP/1.1
+

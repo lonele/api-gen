@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+ 
+<head>
+	<meta charset="utf-8">
+	<base href="../../">
+	<title>api管理-删除接口管理 - Powered By jiadao</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta name="renderer" content="webkit"><meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10" />
+	<meta http-equiv="Expires" content="0"><meta http-equiv="Cache-Control" content="no-cache"><meta http-equiv="Cache-Control" content="no-store">
+	<script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
+	<link href="css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+
+	<link href="css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" />
+	<script src="js/jquery.dataTables.min.js" type="text/javascript"></script> 
+	
+	<script src="js/common.js" type="text/javascript"></script>
+	<script src="js/vue.js"></script>
+	<style>
+		.table-column-select{
+			width: 100px;
+		}
+
+		table.dataTable.nowrap th, table.dataTable.nowrap td{
+			white-space: normal !important;
+		}
+		.placeholder{
+			height: 50px;
+			border: gray solid 1px;
+			background-color: gray;
+		}
+	</style>
+</head>
+<body>
+		<div id="app">
+			<div class="container">
+				
+				<h2>接口管理-删除接口</h2>
+				<div class="row-fluid">
+					<div class="span12">
+						<form  class="form-inline" > 
+							<fieldset>
+								<legend>接口基本信息</legend>
+							
+								<div class="form-group">
+									<label>api名称:</label>
+									<input id="name_cn" name="nameCN" class="form-control" placeholder="请填写接口名称"  type="text" v-model="name"/>
+								</div>
+								<div class="form-group">
+									<label  >api说明:</label>
+									<input id="comments" name="comments" class="form-control required"  placeholder="请填写接口说明"  type="text"  v-model="comment" maxlength="200"/>
+								</div>
+								<div class="form-group">
+									<label>api路径:</label>
+									<input id="api_name" name="name" class="form-control required"  placeholder="请填写接口地址"   type="text" v-model="path" maxlength="200"/>
+									<span>api地址为: /api/delete/{{path}}</span>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+
+				<div class="row-fluid">
+						<div class="span12">
+							<h3>
+								选择要导入的表
+							</h3>
+							
+							<table class="table table-condensed table-bordered">
+								<thead>
+									<tr>
+										<th> 表名
+										</th>
+										<th> 中文注释
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									
+										<td>
+											<select v-model="genSql" style="width: 150px;">
+												<option v-for=" (table, idx) in all_tables" :value="table" title="">{{table}}</option>
+											</select>
+										</td>
+										<td>{{tableNameCn}}
+										</td>
+									
+								</tbody>
+							</table>
+						</div>
+					</div>
+				
+				<button class="btn btn-primary" type="button" @click="createApi">保存api</button>
+						
+				<div class="row-fluid">
+					<div class="span12">
+						
+						<h3>请求url</h3>
+						<code>http://{{host}}/api/delete/{{path}}</code>
+						<h3>请求方式：</h3>
+						<code>POST</code>
+						<form id="editForm" role="form" class="form-inline">
+							<fieldset>
+								<h3>删除测试</h3>
+							
+							<!-- <div class="form-group">
+								<label style="width: 80px;text-align:left;padding-left:20px">主键</label>
+								<input id="dataId" type="text" class="form-control"  placeholder="请输入主键值">
+							</div> -->
+							<div class="form-group">
+								<label style="width: 80px;text-align:left;padding-left:20px">主键值</label>
+								<input id="dataId" name="id" type="text" class="form-control"   placeholder="请输入内容">
+							</div>
+							<div class="form-group">
+								<label style="width: 80px;text-align:left;padding-left:20px">删除方式</label>
+								
+								<select id="deleteFlag" name="deleteFlag"  class="table-column-select">
+									<option value="false" selected="selected" >逻辑删除</option>
+									<option value="true" >物理删除</option>
+								</select>
+							</div>
+
+							<div class="form-group">
+								<button type="button" class="btn btn-danger"  @click="deleteTest">确认删除</button>
+							</div>
+
+						
+							</fieldset>
+						</form>
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span12">
+						
+					<h3>接口返回结果格式</h3>
+					<code style='white-space: pre-wrap;'>{{resultJson}}</code>
+						
+					</div>
+				</div>
+			</div>
+			
+		</div>
+
+    <script type="text/javascript">
+
+	</script>
+
+<script type="text/javascript">
+	
+	var index = 0;
+
+
+	$(function  () {
+		
+		
+	});
+
+	</script>
+
+	<script>
+	var apiData ={
+			id:0,
+			name:'删除xx信息接口',
+			path:'',
+			comment:'',
+			type:'delete',
+			//所有的表，不需要存储
+			all_tables:[],
+			resultColumns:[],
+			//table_name:'t_course',
+			//test_arr : { 't_course':[ 'a','b','c']},
+			genSql:'',
+			tableNameCn:''
+	}
+	
+	var app = new Vue({
+		el: '#app',
+		data: apiData,
+
+		mounted:function(){
+			apiId = getUrlParam("id")
+			if( typeof apiId != "undefined" && apiId != null ){
+				apiData.id =  apiId
+				$.ajax({
+					type:"get",
+					url:"api-gen/getApi",
+					data:{apiId:apiId},
+					success:function(ret){
+						console.log(ret)
+						if(ret.code == CODE_SUCCESS){
+							result = ret.data
+							result['resultColumns'] = $.parseJSON(result['resultColumns'])
+							$.extend(apiData,result)
+							
+							// apiData.tables_info = []
+							// $.each(result['selectTableInfo'],function(key,value){
+							// 	//回显已选择的表格
+							// 	apiData.tables_info.push({name:key,name_cn:value.name_cn,alias:value.alias});
+							// })
+							
+							$('#api_name').attr("readonly","readonly")
+						}
+					}
+				})
+			}
+			
+
+
+			console.log('===vue mounted, load all tables=====')
+			$.get('table/getTableNames',function(data){
+				console.log(JSON.stringify(data))
+				apiData.all_tables = data;
+			},'json')
+
+			
+		},
+		methods:{
+
+			//加载已选择的表
+			loadSelectTables:function(){
+				// select_tables = []
+				// apiData.tables_info.forEach(function(item,index){
+				// 	select_tables.push(item.name)
+				// })
+				$.ajax({
+					type:"post",
+					url:"table/getTableByNames",
+					traditional:true,
+					data:{tableNames:[apiData.genSql]},
+					success:function(ret){
+						console.log(ret)
+						if(ret.code == CODE_SUCCESS && ret.data.length > 0){
+							count = 1//排序计数
+							//清空已选中数据表
+							// apiData.selectTableInfo = {}
+							// apiData.tables_info = []
+							// apiData.tableJoins = []
+							apiData.resultColumns = []
+							//赋值已选的表数据
+							// apiData.select_table_columns = {}
+							tableDatas = ret.data
+							tableDatas.forEach(function(table,index){
+								table_alias = String.fromCharCode(97+index)
+								apiData.tableNameCn = table.nameCN
+								//apiData.selectTableInfo[table.name] = {'name_cn':table.nameCN,'alias':table_alias}
+								//apiData.tables_info.push({'name':table.name,'name_cn':table.nameCN,'alias':table_alias})
+								//table_aliases[table.name] = table_alias
+								//预置连接条件，将第一个表作为主表
+								//apiData.tableJoins.push({left_table:tableDatas[0].name,left_column:'',join_type:'inner join',right_table:'',right_column:''})
+								//apiData.select_table_columns[table.name] = table.columns
+								table.columns.forEach(function(column,idx){
+									column_name_alias = table_alias+'_'+column.name
+									result_column = {	status:true,
+														table_name:table.name,
+														table_alias:table_alias,
+														column_name:column.name,
+														column_name_cn:column.nameCN,
+														//column_name_alias:column_name_alias,
+														column_name_alias:column.name,
+														//column_type:'text',
+														column_index:count,
+														column_order:'',
+														column_query_type:'',
+														column_test_value:'',
+														column_test_value2:''
+													}
+									apiData.resultColumns.push(result_column) 
+									count += 1
+
+									
+								})
+							})
+						}
+						else{
+							console.log('加载失败'+select_tables)
+						}
+					}
+				})
+			},
+
+			createApi:function(){
+				//复制apiData对象到params
+				if(apiData.name=="" || apiData.path==""){
+					alert("api名称和地址必填")
+					return
+				}
+				var params = $.extend(true, {}, apiData);
+				delete params["all_tables"]
+
+				params['resultColumns'] = JSON.stringify(params['resultColumns'])
+				$.ajax({
+					type:'post',
+					url:'api-gen/createApi',
+					data:JSON.stringify(params),
+					contentType:"application/json;charset=UTF-8",
+					success:function(ret){
+						console.log(ret);
+						if(ret.code==CODE_SUCCESS){
+							apiData.id = ret.data;
+							alert('保存api成功')
+							$('#api_name').attr("readonly","readonly")
+						}
+						else{
+							alert('保存api失败：'+ret.msg)
+						}
+					},
+					error:function () {
+						alert('发生错误：')
+					}
+				});
+			},
+
+			deleteTest:function()  {
+				var id = $("#dataId").val()
+				var deleteFlag=$("#deleteFlag").val()
+				if(id==""){
+					alert("请输入id")
+					return
+				}
+				var params = {	
+								tableName:apiData.genSql,
+								id:id,
+								deleteFlag:deleteFlag
+							 }
+				$.ajax({
+					type:'post',
+					url:'api-gen/delete',
+					data:params,
+					success:function(ret){
+						console.log(ret);
+						if(ret.code == 0){
+							alert('删除成功')
+						}
+						else{
+							if ('false'==deleteFlag){
+								alert('删除失败,请确认表中是否有delete_flag字段')
+							}
+							else{
+								alert('删除失败')
+							}
+						}
+						
+					},
+					error:function () {
+						if ('false'==deleteFlag){
+								alert('删除错误,请确认表中是否有delete_flag字段')
+						}
+						else{
+							alert('删除错误')
+						}
+					}
+				});
+			}
+		},
+		computed:{
+			host:function(){
+				return window.location.hostname +':'+ window.location.port
+			},
+			//自动计算组装的sql
+			insertColumns:function(){
+				insert_columns = []
+				count = 1;
+				apiData.resultColumns.forEach(function(column,index){
+						//如果该列未选中  或者列名是id
+						if(column.status == false ){
+							column.column_index=''
+							return false
+						}
+						column.column_index = count
+						count += 1
+						insert_columns.push({column:column.column_name,name:column.column_name_cn})
+				})
+				return insert_columns
+			},
+			resultJson: function(){
+				var jsonObj = {code:'状态码：200表示成功',
+								msg:'服务端返回信息'
+								}
+				return JSON.stringify(jsonObj, null, 2)
+			}
+		}
+	})
+</script>
+</body>
+</html>

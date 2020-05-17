@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+ 
+<head>
+    <meta charset="utf-8">
+	<base href="../../">
+	<title>数据库表管理 - Powered By jiadao</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta name="renderer" content="webkit"><meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10" />
+	<meta http-equiv="Expires" content="0"><meta http-equiv="Cache-Control" content="no-cache"><meta http-equiv="Cache-Control" content="no-store">
+	<script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
+	<link href="css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+
+	<link href="css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" />
+	<script src="js/jquery.dataTables.min.js" type="text/javascript"></script> 
+	
+	<script src="js/Sortable.js" type="text/javascript"></script>
+	<script src="js/common.js" type="text/javascript"></script>
+	<script src="js/vue.js"></script>
+	<style>
+		.table-column-select{
+			width: 100px;
+		}
+		.placeholder{
+			height: 50px;
+			border: gray solid 1px;
+			background-color: gray;
+		}
+		table.dataTable.nowrap th, table.dataTable.nowrap td{
+			white-space: normal !important;
+		}
+
+	</style>
+</head>
+<body>
+		<div id="app">
+			<div class="container">
+				<h3>数据库表管理</h3>
+				
+				<div class="row-fluid" style="padding-top: 20px;" >
+
+					<p>
+						<a target="_blank"  href="pages/table/table_add.html" type="button" class="btn btn-primary">新建表</a>
+						</p> 
+				</div>
+				<div class="row-fluid">
+					<div class="span12">
+						<table id="test-result" class="table table-bordered table-striped"></table>
+					
+					</div>
+				</div>
+			</div>
+			
+		</div>
+
+<script type="text/javascript">
+	var data_table = null
+ 
+	function rebuildTable(url){
+		
+		if(data_table != null){
+			//销毁对象
+			data_table.destroy()
+			//清空dom
+			$('#test-result').empty()
+		}
+		//复制resultHeaders对象，不然会被DataTable修改，添加额外信息
+		var result_headers = $.extend(true, [], apiData.resultHeaders);
+		
+		data_table = $('#test-result').DataTable( {
+				renderer: "bootstrap",
+				ajax:{
+					url:url,
+					type:'post',
+				},
+				destroy: true,
+				ordering:false,
+				paging: true,
+				lengthChange: false,
+				pageLength: 20,
+				searching:false,
+				//data: data,
+				// scrollX:true,//水平滚动
+				// autoWidth:true,
+				columns:  result_headers,
+				language:datatable_language,
+				autoWidth: false,
+				columnDefs:[
+                	{
+                        "targets":[1],
+						"data": 'id',
+						"render": function ( data, type, row, meta ) {
+							return '<a target="_blank"  href="pages/table/table_add.html?name='+row.name+'">'+data+'</a>'
+						}
+					},
+					{
+						"targets":[3],
+						"render": function ( data, type, row, meta ) {
+							return '<button name="del" type="button" class="btn btn-danger">删除</button>'
+						}
+                     } 
+                ]
+		});
+
+	}
+
+	$(function(){
+		$('#test-result tbody').on( 'click', 'button[name=del]', function () {
+            var data = data_table.row( $(this).parents('tr') ).data();
+			console.log(JSON.stringify(data))
+			if(confirm('确认删除'+data.name+"吗？")){
+				$.ajax({
+					url: 'table/dropTable',
+					type: 'POST',
+					dataType: 'json',
+					data: {tableName:data.name},
+				})
+				.done(function(data) {
+					if (data.code==CODE_SUCCESS) {
+						alert("删除成功")
+						data_table.ajax.reload();
+					}
+					else if(data.msg == "1"){
+						alert("删除失败，表中有数据请先清空表再删除")
+					}
+					else{
+						alert("删除失败")
+					}
+				})
+				.fail(function() {
+					alert("error");
+				});
+			}
+        });
+	})
+
+
+	</script>
+
+	<script>
+	var apiData ={
+			
+			resultHeaders:[{'title':'数据库','data':'db',width:"30px"},
+			{'title':'表名', 'data':'name',width:"60px"},
+			{'title':'备注','data':'nameCN',width:"60px"},
+			{'title':'操作','data':'',width:"60px"}]
+	}
+	
+	var app = new Vue({
+		el: '#app',
+		data: apiData,
+
+		mounted:function(){
+				// rebuildTable('/api-gen/getApiList',params)
+				this.queryApi()
+		},
+		methods:{
+			queryApi:function()  {
+				
+				rebuildTable('table/getTableList')
+				
+			}
+			
+
+		},
+		computed:{
+			
+		}
+	})
+</script>
+</body>
+</html>

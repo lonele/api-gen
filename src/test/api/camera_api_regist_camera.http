@@ -1,0 +1,6 @@
+@hostname=localhost
+@port=443//端口号
+@host={{hostname}}:{{port}}
+//注意：不能有空格出现
+GET https://localhost/web_camera_api/regist_camera HTTP/1.1
+Authorization: Basic 1 4UQ3cNWw

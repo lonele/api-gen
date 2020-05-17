@@ -1,0 +1,9 @@
+//测试删除接口
+@hostname=localhost
+@port=8080
+@host={{hostname}}:{{port}}
+//注意：不能有空格出现
+POST  http://{{host}}/api/delete/delete_student HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+id=7&delete_flag=false

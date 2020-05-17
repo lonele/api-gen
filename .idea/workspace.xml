@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="5c9050ab-cb97-4ea0-9929-e0d93fbcc96f" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DefaultGradleProjectSettings">
+    <option name="isMigrated" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="userSettingsFile" value="$PROJECT_DIR$/../setting.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1X33iCcI0dzebMWHf9oKKlyAkHq" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/static/pages/table" />
+    <property name="node.js.detected.package.stylelint" value="true" />
+    <property name="node.js.path.for.package.stylelint" value="project" />
+    <property name="node.js.selected.package.stylelint" value="" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/static/pages/table" />
+      <recent name="$PROJECT_DIR$/src/main/resources/static/designForm/bootstrap/formDesign/js" />
+      <recent name="$PROJECT_DIR$/src/main/resources/static/designForm/bootstrap" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.jiadao.model" />
+      <recent name="com.jiadao" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/com/jiadao/controller" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.WebApplication">
+    <configuration default="true" type="Applet">
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.jiadao.WebApplication" />
+      <module name="jiadao-api-gen" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.jiadao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DBTableTest.testTableQuery" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="jiadao-api-gen" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.jiadao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.jiadao" />
+      <option name="MAIN_CLASS_NAME" value="com.jiadao.DBTableTest" />
+      <option name="METHOD_NAME" value="testTableQuery" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StudentTest.testQueryScore" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="jiadao-api-gen" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.jiadao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.jiadao" />
+      <option name="MAIN_CLASS_NAME" value="com.jiadao.StudentTest" />
+      <option name="METHOD_NAME" value="testQueryScore" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="jiadao-common-dao" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.jiadao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jiadao.WebApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="TestNG">
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file enabled="true" id="idea.log" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.WebApplication" />
+        <item itemvalue="JUnit.StudentTest.testQueryScore" />
+        <item itemvalue="JUnit.DBTableTest.testTableQuery" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5c9050ab-cb97-4ea0-9929-e0d93fbcc96f" name="Default Changelist" comment="" />
+      <created>1577361632696</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1577361632696</updated>
+      <workItem from="1577361640067" duration="6274000" />
+      <workItem from="1577435626682" duration="77000" />
+      <workItem from="1577438231567" duration="644000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="6995000" />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="348" y="107" key="#Project_Structure" timestamp="1580261670766">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state x="348" y="107" key="#Project_Structure/0.23.1440.835@0.23.1440.835" timestamp="1580261670766" />
+    <state x="518" y="136" key="#com.intellij.ide.util.MemberChooser" timestamp="1580450723446">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state x="518" y="136" key="#com.intellij.ide.util.MemberChooser/0.23.1440.835@0.23.1440.835" timestamp="1580450723446" />
+    <state width="1334" height="198" key="GridCell.Tab.0.bottom" timestamp="1580474529239">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state width="1334" height="198" key="GridCell.Tab.0.bottom/0.23.1440.835@0.23.1440.835" timestamp="1580474529239" />
+    <state width="1334" height="198" key="GridCell.Tab.0.center" timestamp="1580474529238">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state width="1334" height="198" key="GridCell.Tab.0.center/0.23.1440.835@0.23.1440.835" timestamp="1580474529238" />
+    <state width="1334" height="198" key="GridCell.Tab.0.left" timestamp="1580474529238">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state width="1334" height="198" key="GridCell.Tab.0.left/0.23.1440.835@0.23.1440.835" timestamp="1580474529238" />
+    <state width="1334" height="198" key="GridCell.Tab.0.right" timestamp="1580474529238">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state width="1334" height="198" key="GridCell.Tab.0.right/0.23.1440.835@0.23.1440.835" timestamp="1580474529238" />
+    <state width="1334" height="198" key="GridCell.Tab.1.bottom" timestamp="1580474529240">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state width="1334" height="198" key="GridCell.Tab.1.bottom/0.23.1440.835@0.23.1440.835" timestamp="1580474529240" />
+    <state width="1334" height="198" key="GridCell.Tab.1.center" timestamp="1580474529240">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state width="1334" height="198" key="GridCell.Tab.1.center/0.23.1440.835@0.23.1440.835" timestamp="1580474529240" />
+    <state width="1334" height="198" key="GridCell.Tab.1.left" timestamp="1580474529239">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state width="1334" height="198" key="GridCell.Tab.1.left/0.23.1440.835@0.23.1440.835" timestamp="1580474529239" />
+    <state width="1334" height="198" key="GridCell.Tab.1.right" timestamp="1580474529240">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state width="1334" height="198" key="GridCell.Tab.1.right/0.23.1440.835@0.23.1440.835" timestamp="1580474529240" />
+    <state x="257" y="79" key="SettingsEditor" timestamp="1580442427318">
+      <screen x="0" y="23" width="1440" height="835" />
+    </state>
+    <state x="257" y="79" key="SettingsEditor/0.23.1440.835@0.23.1440.835" timestamp="1580442427318" />
+  </component>
+</project>

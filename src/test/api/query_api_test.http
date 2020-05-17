@@ -1,0 +1,12 @@
+//测试保存提交
+@hostname=localhost
+@port=8080//端口号
+@host={{hostname}}:{{port}}
+//注意：不能有空格出现
+# POST  http://localhost:8880/api/query/student_list HTTP/1.1
+POST  http://localhost:8088/api/query/student_list HTTP/1.1
+Content-Type: application/json
+//用户id: 1001
+Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjEwMDEsInJvbGVzIjoiWzQsIDUsIDZdIiwibmFtZSI6ImxlbCIsImV4cCI6MTU4NTI2ODg0NSwiZGVwdHMiOiJbMSwgMiwgM10ifQ.KI54GT-YOTZVxQzynzwfBEcaDCo55QBKbBtgPR_mal0
+
+{ "name": "张" }

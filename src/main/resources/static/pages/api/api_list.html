@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+ 
+<head>
+    <meta charset="utf-8">
+	<base href="../../">
+	<title>API接口管理 - Powered By jiadao</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta name="renderer" content="webkit"><meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10" />
+	<meta http-equiv="Expires" content="0"><meta http-equiv="Cache-Control" content="no-cache"><meta http-equiv="Cache-Control" content="no-store">
+	<script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
+	<link href="css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+
+	<link href="css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" />
+	<script src="js/jquery.dataTables.min.js" type="text/javascript"></script> 
+	
+	<script src="js/Sortable.js" type="text/javascript"></script>
+	<script src="js/common.js" type="text/javascript"></script>
+	<script src="js/vue.js"></script>
+	<style>
+		.table-column-select{
+			width: 100px;
+		}
+		.placeholder{
+			height: 50px;
+			border: gray solid 1px;
+			background-color: gray;
+		}
+		table.dataTable.nowrap th, table.dataTable.nowrap td{
+			white-space: normal !important;
+		}
+
+	</style>
+</head>
+<body>
+		<div id="app">
+			<div class="container">
+				<h3>API接口管理</h3>
+				<div class="row-fluid">
+					<div class="span12">
+						<form role="form" class="form-inline" style="background: #f7f7f7;">
+							<fieldset>
+							<!-- 顺序排列所有查询条件 -->
+							<div v-for=" (value, name) in whereConditions" class="form-group">
+								<label style="width: 80px;text-align:left;padding-left:20px">{{value.name}}</label>
+								<input v-model="value.value" type="text" class="form-control"   placeholder="请输入查询内容">
+							</div>
+							<button type="button" class="btn btn-default"  @click="queryApi">查询</button>
+						
+							</fieldset>
+						</form>
+					</div>
+				</div>
+				<div class="row-fluid" style="padding-top: 20px;" >
+
+					<p>
+						<a target="_blank"  href="pages/api/api_query_add.html" type="button" class="btn btn-primary">新增单表/多表查询接口</a>
+						<a target="_blank"  href="pages/api/api_fetch_add.html" type="button" class="btn btn-default">新增单表主键查询接口</a>
+						<a target="_blank"  href="pages/api/api_save_add.html" type="button" class="btn btn-default">新增单表插入接口</a>
+						<a target="_blank"  href="pages/api/api_edit_add.html" type="button" class="btn btn-default">新增单表编辑接口</a>
+						<a target="_blank"  href="pages/api/api_stat_add.html" type="button" class="btn btn-default">新增统计接口</a>
+						<a target="_blank"  href="pages/api/api_delete_add.html" type="button" class="btn btn-danger">新增删除接口</a>
+						<!-- <a target="_blank"  href="pages/api/api_save_add.html" type="button" class="btn btn-default">删除接口</a> -->
+					  </p> 
+				</div>
+				<div class="row-fluid">
+					<div class="span12">
+						<table id="test-result" class="table table-bordered table-striped" style="width: 1200px;"></table>
+					
+					</div>
+				</div>
+			</div>
+			
+		</div>
+
+<script type="text/javascript">
+	var data_table = null
+	var api_type_method = {'save':'POST','edit':'POST','query':'POST','delete':'GET','stat':'POST','fetch':'GET'}
+
+	function rebuildTable(url,params,data){
+		if(apiData.resultHeaders.length<1){
+			return;
+		}
+		if(data_table != null){
+			//销毁对象
+			data_table.destroy()
+			//清空dom
+			$('#test-result').empty()
+		}
+		//复制resultHeaders对象，不然会被DataTable修改，添加额外信息
+		var result_headers = $.extend(true, [], apiData.resultHeaders);
+		//var pageSize = 5
+		data_table = $('#test-result').DataTable( {
+				renderer: "bootstrap",
+				ajax:{
+					url:url,
+					type:'post',
+					// data:params
+					data:function(data){
+						// console.log(JSON.stringify(data))
+						//传递给后台的页码
+						params.pageIndex = (data.start / data.length) + 1
+						//传递给后台的每页条数
+						params.pageSize =  data.length
+						console.log(params)
+						return params
+					}
+				},
+				processing: true,
+        		serverSide: true,//服务端分页必传，否则不正常
+				destroy: true,
+				ordering:false,
+				paging: true,
+				lengthChange: false,//每页展示条数下拉框
+				pageLength: 5,
+				searching:false,//表格搜索框
+				scrollX:true,//水平滚动
+				autoWidth: false,//宽度自适应
+				columns:  result_headers,
+				language:datatable_language,
+				columnDefs:[
+                	{
+                        "targets":[1],
+						"data": 'id',
+						"render": function ( data, type, row, meta ) {
+							return '<a target="_blank" title="'+row.comment+'"  href="pages/api/api_'+row.type+'_add.html?id='+row.id+'">'+data+'</a>'
+						}
+                     } 
+					 ,{
+                        "targets":[2],
+						"data": 'id',
+						"render": function ( data, type, row, meta ) {
+							return  'http://'+window.location.hostname +':'+ window.location.port+'/api/'+row.type+'/'+row.path
+						}
+                     } ,{
+                        "targets":[3],
+						"render": function ( data, type, row, meta ) {
+							return api_type_method[row.type]
+						}
+                     } ,{
+						"targets":[4],
+						//'data':'where_conditions',
+						"render": function ( data, type, row, meta ) {
+							var params_str = '<code>'
+							var jsonObj = {}
+							if(row.type=='fetch'){
+								jsonObj = {id:'主键'}
+								//params_str += 'id=主键'
+							}
+							else if(row.type=='delete'){
+								jsonObj = {id:'主键','deleteFlag':'是否物理删除'}
+								//params_str += 'id=主键&delete'
+							}
+							else if(row.type=='query' || row.type=='stat'|| row.type=='save' || row.type=='edit'){
+								
+								var params = JSON.parse(row.where_conditions);
+								$.each(params,function(index,value){
+									console.log('value.default_value==='+value.default_value)
+									if(typeof(value.default_value) == 'undefined' || value.default_value==''){
+										jsonObj[index] = value.name
+									}
+								})
+								if(row.type=='query' || row.type=='stat'){
+									jsonObj['pageIndex'] = '页码'
+									jsonObj['pageSize'] = '每页条数'
+								}
+								else if(row.type=='edit'){
+									jsonObj['id'] = '主键'
+								}
+							}
+							params_str += JSON.stringify(jsonObj, null, 2)
+							params_str += '<code>'
+							return params_str
+						}
+                     } ,
+					{"targets":[5],
+						"render": function ( data, type, row, meta ) {
+							if(row.status == '0'){
+								return '已启用 <button name="disable"" type="button" class="btn btn-warning">禁用</button>'
+							}
+							else if(row.status == '-1'){
+								return '已禁用 <button name="enable" type="button" class="btn btn-primary">启用</button>'
+							}
+						}
+                     }  ,
+					{"targets":[6],
+						"render": function ( data, type, row, meta ) {
+							if(row.status == -1){
+								return '<button name="del" type="button" class="btn btn-danger">删除</button>'
+							}
+							else{
+								return ''
+							}
+						}
+                     } 
+                ]
+		});
+
+	}
+
+	$(function(){
+		$('#test-result tbody').on( 'click', 'button', function () {
+			console.log(this.name)
+			var data = data_table.row( $(this).parents('tr') ).data();
+			if(this.name == 'del'){
+				if(confirm('确认要删除'+data.name+"吗？")){
+					$.ajax({
+						url: 'api-gen/deleteApi',
+						//url: 'api-gen/deleteApi',
+						type: 'GET',
+						dataType: 'json',
+						//data: {apiId: data.id},
+						data: {apiPath: data.path}
+					})
+					.done(function(data) {
+						if (data.code==CODE_SUCCESS) {
+							data_table.ajax.reload();
+						};
+					})
+					.fail(function() {
+						alert("error");
+					});
+				}
+			}
+			else{
+				var opt = data.status== "0" ? "禁用" : "启用"
+				if(confirm('确认要'+opt +data.name+"吗？")){
+					$.ajax({
+						url: 'api-gen/changeApiStatus',
+						type: 'GET',
+						dataType: 'json',
+						data: {apiPath: data.path}
+					})
+					.done(function(data) {
+						if (data.code==CODE_SUCCESS) {
+							data_table.ajax.reload();
+						};
+					})
+					.fail(function() {
+						alert("error");
+					});
+				}
+			}
+			
+        });
+	})
+
+
+	</script>
+
+	<script>
+	var apiData ={
+			whereConditions:{'name':{'column':'name','name':'接口名称','opt':'like'},
+							 'path':{'column':'path','name':'接口地址','opt':'like'},
+							 //'type':{'column':'type','name':'接口类型','opt':'='}
+							 },
+			resultHeaders:[{'title':'ID','data':'id',width:"10px"},
+			{'title':'接口名称', 'data':'name',width:"80px"},
+			{'title':'接口地址','data':'path',width:"120px"},
+			{'title':'请求方法','data':'',width:"80px"},
+			//{'title':'接口说明','data':'comment',width:"120px"},
+			{'title':'入参','data':'',width:"200px"},
+			//{'title':'sql','data':'gen_sql'},
+			//{'title':'附加sql','data':'add_sql',width:"60px"},
+			{'title':'状态','data':'status',width:"100px"},
+			{'title':'操作','data':''}]
+	}
+	
+	var app = new Vue({
+		el: '#app',
+		data: apiData,
+
+		mounted:function(){
+				// rebuildTable('/api-gen/getApiList',params)
+				this.queryApi()
+		},
+		methods:{
+			queryApi:function()  {
+				//组装查询条件
+				jsonParams = {}
+				$.each(apiData.whereConditions, function(key, val) {  
+					//筛选不为空的条件
+					if(typeof val.value != "undefined" && val.value != ''){
+						var input_value = val.value
+						if (val.opt=='like'){
+							jsonParams[key] = "%"+input_value+"%"
+						}
+						else if (val.opt=='left_like'){
+							jsonParams[key] = "%"+input_value
+						}
+						else if (val.opt=='right_like'){
+							jsonParams[key] = input_value+"%"
+						}
+						else{
+							jsonParams[key] = input_value
+						}
+					}
+				});  
+				var params = {
+								jsonParam:JSON.stringify(jsonParams),
+								whereConditions:JSON.stringify(apiData.whereConditions)
+							 }
+				rebuildTable('api-gen/getApiList',params)
+				
+			}
+		},
+		computed:{
+			
+		}
+	})
+</script>
+</body>
+</html>

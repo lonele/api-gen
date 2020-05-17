@@ -1,0 +1,9 @@
+//测试修改接口
+@hostname=localhost
+@port=8080//端口号
+@host={{hostname}}:{{port}}
+//注意：不能有空格出现
+POST  http://{{host}}/api/edit/edit_student HTTP/1.1
+Content-Type: application/json
+
+{ "name": "ddd",  "age": "333", "sex": "1", "code": "10033","id":4 }
