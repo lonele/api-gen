@@ -17,7 +17,7 @@ import org.springframework.cache.annotation.EnableCaching;
 public class WebApplication extends SpringBootServletInitializer 
 {
     public static void main(String[] args)
-    {
+    { 
         System.out.println("api-gen系统启动中");
         // System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication.run(WebApplication.class, args);

@@ -77,7 +77,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								
+								<tr>
 									<td>
 										<select v-model="genSql"  style="width: 150px;">
 											<option v-for=" (table, idx) in all_tables" :value="table" title="">{{table}}</option>
@@ -85,7 +85,7 @@
 									</td>
 									<td>{{tableNameCn}}
 									</td>
-								
+								</tr>
 							</tbody>
 						</table>
 						<button class="btn btn-primary" type="button" @click="loadSelectTables" >载入数据表信息</button>

@@ -1,4 +1,4 @@
-package com.jiadao.service;
+package com.jiadao.db;
  
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -12,8 +12,8 @@ public class JdbcUtil {
     //private static String DRIVER = "oracle.jdbc.driver.OracleDriver";  
     //获得url  
     //private static String URL = "jdbc:oracle:thin:@localhost:test";  
-	//获得驱动  
-    private static String DRIVER = "com.mysql.cj.jdbc.Driver";  
+	//获得驱动  com.mysql.jdbc.Driver mysql5  com.mysql.cj.jdbc.Driver mysql6
+    private static String DRIVER = "com.mysql.jdbc.Driver";  
     //获得url  
     private static String URL = "jdbc:mysql://localhost:3306/nutsdemo";  
     //获得连接数据库的用户名  
@@ -112,6 +112,13 @@ public class JdbcUtil {
              System.out.println("数据库的时间和日期函数的逗号分隔列表: "+ dbmd.getTimeDateFunctions());    
              System.out.println("数据库的字符串函数的逗号分隔列表: "+ dbmd.getStringFunctions());    
              System.out.println("数据库供应商用于 'schema' 的首选术语: "+ dbmd.getSchemaTerm());    
+             
+             System.out.println("数据库CatalogTerm: " + dbmd.getCatalogTerm()); 
+             ResultSet catalogSet =   dbmd.getCatalogs();
+             while(catalogSet.next()){
+                 System.out.println(catalogSet.getString(1));
+             } 
+             catalogSet.close();
              System.out.println("数据库URL: " + dbmd.getURL());    
              System.out.println("是否允许只读:" + dbmd.isReadOnly());    
              System.out.println("数据库的产品名称:" + dbmd.getDatabaseProductName());    
@@ -242,7 +249,7 @@ public class JdbcUtil {
             rs = dbmd.getPrimaryKeys("nutsdemo", null, "t_member");  
             
             while (rs.next()){  
-            	String tableCat = rs.getString("TABLE_CAT");  //表类别(可为null) 
+            	String tableCat = rs.getString("TABLE_CAT");  //数据库名称(可为null) 
 				String tableSchemaName = rs.getString("TABLE_SCHEM");//表模式（可能为空）,在oracle中获取的是命名空间,其它数据库未知     
 				String tableName = rs.getString("TABLE_NAME");  //表名  
 				String columnName = rs.getString("COLUMN_NAME");//列名  
@@ -398,12 +405,12 @@ public class JdbcUtil {
 	 * @throws 
 	 */
 	public static void main(String[] args) {
-		// getDataBaseInfo();  //获取数据库信息
+		getDataBaseInfo();  //获取数据库信息
 		// getSchemasInfo(); //获取数据库所有Schema
 		// getTablesList();  //获取某用户下所有的表
 		// getTablesInfo();  //获取表信息
-		getPrimaryKeysInfo(); //获取表主键信息
-		getIndexInfo();  //获取表索引信息
+		// getPrimaryKeysInfo(); //获取表主键信息
+		// getIndexInfo();  //获取表索引信息
 		// getColumnsInfo(); //获取表中列值信息
 	}
 }

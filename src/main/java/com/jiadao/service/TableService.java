@@ -13,9 +13,8 @@ import javax.sql.DataSource;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.jiadao.db.MysqlTableOperator;
+import com.jiadao.db.MysqlTableUtil;
 import com.jiadao.db.Table;
-import com.jiadao.db.TableOperator;
 import com.jiadao.model.CustomColumn;
 import com.jiadao.model.CustomTable;
 
@@ -52,7 +51,7 @@ public class TableService {
 
     public boolean createMysqlTable(Table table) throws Exception {
         // CustomTable 
-        TableOperator tableOperator = new MysqlTableOperator(table, jdbcTemplate);
+        MysqlTableUtil tableOperator = new MysqlTableUtil(table, jdbcTemplate);
         boolean isCreate = tableOperator.isTableCreated();
         // System.out.println("isCreate===="+isCreate);
         log.debug("table "+table.getName()+" is_create "+isCreate);

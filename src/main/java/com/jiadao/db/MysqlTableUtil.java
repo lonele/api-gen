@@ -1,28 +1,46 @@
 package com.jiadao.db;
 
+
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import lombok.extern.slf4j.Slf4j;
 
-public class MysqlTableOperator extends TableOperator {
+
+@Slf4j
+public class MysqlTableUtil{
+
+
+	/**
+	 * 表对象
+	 */
+	protected Table<? extends Column> table;
+	/**
+	 * jdbc
+	 */
+	protected JdbcTemplate jdbcTemplate;
+
 
 	/**
 	 * @param table
 	 * @param jdbcTemplate
 	 */
-	public MysqlTableOperator(Table<? extends Column> table, JdbcTemplate jdbcTemplate) {
-		super(table, jdbcTemplate);
+	public MysqlTableUtil(Table<? extends Column> table, JdbcTemplate jdbcTemplate) {
+		
+		this.table = table;
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	@Override
+	// @Override
 	public String type() {
 		return DbType.MYSQL.getKey();
 	}
 
-	@Override
+	// @Override
 	public void createTable() {
 		if (isTableCreated()) {
-			logger.info("表[" + table.getName() + "(" + table.getComment() + ")]已存在数据库中，无需再次生成");
+			log.info("表[" + table.getName() + "(" + table.getComment() + ")]已存在数据库中，无需再次生成");
 			throw new RuntimeException("表[" + table.getName() + "(" + table.getComment() + ")]已存在数据库中，无需再次生成");
 		}
 
@@ -59,18 +77,26 @@ public class MysqlTableOperator extends TableOperator {
 		// 建表结束
 		sql.append(";");
         System.out.println("createTable sql :"+sql.toString());
-		logger.info("createTable",sql.toString());
+		log.info("createTable",sql.toString());
 		jdbcTemplate.execute(sql.toString());
 	}
 
-	@Override
+	// @Override
 	public boolean isTableCreated() {
 		String sql = "select count(1) from information_schema.TABLES t where TABLE_SCHEMA=? and  table_name =?";
 		System.out.println("isTableCreated=="+sql);
 		return jdbcTemplate.queryForObject(sql, Integer.class, table.getDb() ,table.getName()) > 0 ? true : false;
 	}
 
-	@Override
+	public void dropTable() {
+		if (!isTableCreated()) {
+			return;
+		}
+		String sql = "drop table " + table.getName() + "";
+		jdbcTemplate.execute(sql);
+	}
+
+	// @Override
 	public void addColumn(Column column) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("ALTER TABLE " + table.getName() + "");
@@ -78,7 +104,7 @@ public class MysqlTableOperator extends TableOperator {
 		jdbcTemplate.execute(sql.toString());
 	}
 
-	@Override
+	// @Override
 	public void updateColumn(Column column) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("ALTER TABLE " + table.getName() + "");
@@ -86,7 +112,7 @@ public class MysqlTableOperator extends TableOperator {
 		jdbcTemplate.execute(sql.toString());
 	}
 
-	@Override
+	// @Override
 	public void dropColumn(String columnName) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("ALTER TABLE " + table.getName() + "");

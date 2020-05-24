@@ -33,8 +33,8 @@ public class DB {
     @Autowired
     DataSource dataSource;
 
-    @Value("${system.modelPackage}")
-    String modelPackage;
+    // @Value("${system.modelPackage}")
+    // String modelPackage;
 
 
 
@@ -45,7 +45,7 @@ public class DB {
 
     @PostConstruct
     public void init() {
-        System.out.println("modelPackage==" + modelPackage);
+        // System.out.println("modelPackage==" + modelPackage);
         dao = new NutDao(dataSource);
 
         // dao.create(Person.class, false); // false的含义是,如果表已经存在,就不要删除重建了.

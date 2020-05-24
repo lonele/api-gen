@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+ 
+<head>
+	<meta charset="utf-8">
+	<base href="../../">
+	<title>api管理-查询接口 - Powered By jiadao</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta name="renderer" content="webkit"><meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10" />
+	<meta http-equiv="Expires" content="0"><meta http-equiv="Cache-Control" content="no-cache"><meta http-equiv="Cache-Control" content="no-store">
+	<script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
+	<link href="css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+	<script src="js/bootstrap.min.js"  type="text/javascript"></script>
+	<script src="js/jquery.htmlClean.js"  type="text/javascript"></script>
+	
+	<link href="css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" />
+	<script src="js/jquery.dataTables.min.js" type="text/javascript"></script> 
+	
+	<script src="js/Sortable.js" type="text/javascript"></script>
+	<script src="js/common.js" type="text/javascript"></script>
+	<script src="js/vue.js"></script>
+	<style>
+		.table-column-select{
+			width: 100px;
+		}
+
+		table.dataTable.nowrap th, table.dataTable.nowrap td{
+			white-space: normal !important;
+		}
+		.placeholder{
+			height: 50px;
+			border: gray solid 1px;
+			background-color: gray;
+		}
+		#myModal textarea { width:100%;height:280px;resize: none;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;box-sizing: border-box; }
+
+	</style>
+</head>
+<body>
+		<div id="app">
+			<div class="container">
+				
+				<h2>接口管理-单表查询接口</h2>
+				<div class="row-fluid">
+					<div class="span12">
+						<form  class="form-inline" > 
+							<fieldset>
+								<legend>接口基本信息</legend>
+							
+								<div class="form-group">
+									<label>api名称:</label>
+									<input id="name_cn" name="nameCN" class="form-control" placeholder="请填写接口名称"  type="text" v-model="name"/>
+								</div>
+								
+								<div class="form-group">
+									<label  >api说明:</label>
+									<input id="comments" name="comments" class="form-control required"  placeholder="请填写接口说明"  type="text"  v-model="comment" style="width: 300px;" maxlength="200"/>
+								</div>
+
+								<div class="form-group">
+									<label>api路径:</label>
+									<input id="api_name" name="name" class="form-control required"  placeholder="请填写接口地址"   type="text" v-model="path" maxlength="200"/>
+									<span>api地址为: http://{{host}}/api/query/{{path}}</span>
+								</div>
+								
+							</fieldset>
+						</form>
+					</div>
+				</div>
+				
+				<div class="row-fluid">
+					<div class="span12">
+						<h3>
+							选择要导入的表
+						</h3>
+						
+						<table class="table table-condensed table-bordered">
+							<thead>
+								<tr>
+									<th> 表名
+									</th>
+									<th> 中文注释
+									</th>
+									<th> 别名
+									</th>
+									<th> 操作 </th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr  v-for=" (item, index) in tables_info" :key="index">
+									<td>
+										<select v-model="item.name"  class="form-control">
+											<option v-for=" (table, idx) in all_tables" :value="table" title="">{{table}}</option>
+										</select>
+									</td>
+									<td>{{item.name_cn}}
+									</td>
+									<td>{{item.alias}}
+									</td>
+									
+									<td>
+										<!-- <button @click="delTable(index)" type="button" class="btn btn-warning">删除</button> -->
+									</td>
+								</tr>
+								
+							</tbody>
+						</table>
+						<button class="btn btn-primary" type="button" @click="loadSelectTables" >载入数据表信息</button>
+					</div>
+				</div>
+				<div class="row-fluid hidden">
+					<div class="span12">
+						<h3>
+							设置表连接
+						</h3>
+						<table class="table table-condensed table-bordered">
+							<thead>
+								<tr>
+									<th> 表 </th>
+									<th> 字段 </th>
+									<th> 连接方式 </th>
+									<th> 表 </th>
+									<th> 字段 </th>
+									<th> 操作 </th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr  v-for=" (item, index) in tableJoins" :key="index">
+									<td>
+										<select v-model="item.left_table"  class="form-control" >
+											<option v-for=" (value, name) in selectTableInfo" :value="name" title="">{{name}}</option>
+										</select>
+									</td>
+									<td>
+										<select v-model="item.left_column"   class="form-control">
+											<option v-for=" (column, idx) in select_table_columns[item.left_table]" :value="column.name" title="">{{column.name}}</option>
+										</select>
+									</td>
+									<td>
+										<select v-model="item.join_type"   class="form-control">
+											<option value="" selected="selected" title=""></option>
+											<option value="inner join" title="">inner join</option>
+											<option value="left join" title="">left join</option>
+											<option value="right join" title="">right join</option>
+										</select>
+									</td>
+									<td>
+										<select v-model="item.right_table"   class="form-control"  style="width: 150px;">
+											<option v-for=" (value, name) in selectTableInfo" :value="name" title="">{{name}}</option>
+										</select>
+									</td>
+									<td>
+										<select v-model="item.right_column"   class="form-control">
+											<option v-for=" (column, idx) in select_table_columns[item.right_table]" :value="column.name" title="">{{column.name}}</option>
+										</select>
+									</td>
+									<td>
+										<button @click="delTableJoin(index)" type="button" class="btn btn-warning">
+											删除
+										</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<button class="btn btn-success" type="button" @click="addJoin" >添加连接条件</button> 
+						<!-- <button class="btn btn-primary" type="button" @click="deleteJoin" >删除连接条件</button> -->
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span12">
+						<h3> 设置查询结果(可拖动排序) </h3>
+						<table id="result_table" class="table table-condensed table-bordered">
+							<thead>
+								<tr>
+									<th>是否显示</th>
+									<th>表</th>
+									<th>原字段名</th>
+									<th> 中文注释 </th>
+									<th> 结果字段名
+									</th>
+									<th> 显示顺序
+									</th>
+									<th> 排序字段及规则
+									</th>
+									<th> 查询字段及规则
+									</th>
+									<th> 默认值
+									</th>
+									<th> 字典或格式
+									</th>
+									<!-- <th> 测试值
+									</th>
+									<th> 测试值2
+									</th> -->
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for=" (item, index) in resultColumns" :key="item.column_name_alias" >
+									<td ><input type="checkbox" v-model="item.status" /></td>
+									<td>{{item.table_name}}</td>
+									<td>{{item.column_name}}</td>
+									<td>
+										<input type="text" v-model="item.column_name_cn" >
+									</td>
+									<td>
+										{{item.column_name_alias}}
+									</td>
+									<td>
+										{{item.column_index}}
+									</td>
+									<td>
+										<select name="column_order" v-model="item.column_order"   class="form-control">
+											<option value="asc" title="">正序</option>
+											<option value="desc"  title="">倒序</option>
+										</select>
+									</td>
+									<td>
+										<select name="queryType"  v-model="item.column_query_type"    class="form-control">
+											<option value="" selected title=""></option>
+											<option value="="  title="">=</option>
+											<option value="!="  title="">!=</option>
+											<option value="&gt;"  title="">&gt;</option>
+											<option value="&gt;="  title="">&gt;=</option>
+											<option value="&lt;"  title="">&lt;</option>
+											<option value="&lt;="  title="">&lt;=</option>
+											<option value="between"  title="">Between</option>
+											<option value="like"  title="">Like</option>
+											<!-- <option value="left_like"  title="">Left Like</option>
+											<option value="right_like"  title="">Right Like</option> -->
+									</select>
+									</td>
+									<td>
+										<input type="text"  v-model="item.default_value" maxlength="200"/>
+									</td>
+									<td>
+										<input type="text"  v-model="item.column_format" maxlength="200"/>
+									</td>
+									<!-- <td>
+										<input type="text"  v-model="item.column_test_value" maxlength="200" class="table-column-select"/>
+									</td>
+									<td>
+										<input type="text"  v-model="item.column_test_value2" maxlength="200" class="table-column-select"/>
+									</td> -->
+								</tr>
+								
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span12">
+						<h3>
+							生成sql
+						</h3>
+						<h4 class="dl-horizontal" id="genSql">
+							{{sql}}
+						</h4> 
+						<!-- <h4 class="dl-horizontal" id="genSql">
+							{{addSql}}
+						</h4> -->
+						<button class="btn btn-primary" type="button" @click="createApi">保存api</button>
+						
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span12">
+						
+						<h3>请求url</h3>
+						<code>http://{{host}}/api/query/{{path}}</code>
+						<h3>请求方式：</h3>
+						<code>POST</code>
+						<div  id="queryForm" class="hidden">
+							<form role="form" class="form-inline" >
+								
+								<!-- 顺序排列所有查询条件  -->
+								<div >
+									<div v-for=" (value, name) in whereConditions" class="form-group" >
+										<label style="width: 80px;text-align:left;padding-left:20px">{{value.name}}</label>
+										
+										<input v-model="value.value" type="text" class="form-control"   placeholder="请输入查询内容">
+									</div>
+								</div>
+								<div class="form-group">
+									<button type="button" class="btn btn-success">查询</button>
+								</div>
+							</form>
+						</div>
+						<h3>查询条件(json body)</h3>
+						<table class="table table-condensed table-bordered">
+							<thead>
+								<tr>
+									<th> 参数名
+									</th>
+									<th> 说明
+									</th>
+									<th> 测试值
+									</th>
+									<th> 默认值
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for=" (value, name) in whereConditions" >
+									<td>{{name}}</td>
+									<td>{{value.name}}</td>
+									<td>
+										<input v-model="value.value" v-if="value.default_value" readonly="readonly"  type="text" class="form-control"   placeholder="请输入查询内容">
+										<input v-model="value.value" v-else type="text" class="form-control"   placeholder="请输入查询内容">
+										
+									</td>
+									<td><input v-model="value.default_value" readonly="readonly" type="text" class="form-control"   placeholder="">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="form-group">
+							<button type="button" class="btn btn-success"  @click="queryTest">查询</button>
+							
+							
+						</div>
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span12">
+						<h3>查询结果(默认显示前20条)</h3>
+						<table id="test-result" class="table table-bordered table-striped" style="width:100%"></table>
+						<h3>接口返回结果格式</h3>
+						<code style='white-space: pre-wrap;'>{{resultJson}}</code>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+
+
+
+<script type="text/javascript">
+	
+	var index = 0;
+	// var jsonParams = {}
+// 	from
+//  t_score  inner join t_student
+// on t_student.`code` = t_score.student_code
+// left join t_course 
+// on t_course.`code` = t_score.course_code
+	//组装sql的函数
+
+	var data_table = null
+	$(function  () {
+		//结果表格拖拽排序功能
+		const tbody = document.querySelector('#result_table tbody')
+		Sortable.create(tbody, {
+			onEnd({ newIndex, oldIndex }) {
+				console.log(oldIndex+"===="+newIndex)
+				if(newIndex == oldIndex){
+					return
+				}
+				const currRow = apiData.resultColumns.splice(oldIndex, 1)[0]
+				apiData.resultColumns.splice(newIndex, 0, currRow)
+				apiData.resultColumns.forEach(function(column,index){
+					// console.log(column)
+					//排序后，重新设定序号
+					column.column_index = index+1	
+				})
+				
+			}
+		})
+
+		//复制查询表单代码
+		$(".copy-btn").click(function() { 
+			var e = document.getElementById("querFromHtml"); 
+			e.select(); // 选择表单元素对象 
+			//以下代码用户复制普通html节点
+			//var range = document.createRange();
+				// 选中需要复制的节点  
+			//range.selectNode(e);
+				// 执行选中元素  
+			//window.getSelection().addRange(range);
+			//document.execCommand("Copy"); // 执行浏览器复制命令
+				// 执行 copy 操作  
+				var successful = document.execCommand('Copy');
+				try {
+					var msg = successful ? '复制成功！' : '复制失败';
+					alert(msg);
+				} catch (err) {
+					alert('复制失败!');
+				}
+			 
+		})
+		
+	});
+
+	//function buildSql(resultColumns,tableJoins){
+	//组装sql语句
+	function buildSql(){
+		sql = "select " 
+		var select_fields = []
+		var order_fields = []
+		var where_fields = []
+		apiData.resultHeaders= []
+		// jsonParams = {}
+		apiData.whereConditions = {}
+		// apiData.resultColumns.sort(function(a,b){
+		// 		if(a.column_index > b.column_index) return 1 ;
+		// 		if(a.column_index < b.column_index) return -1 ;
+		// 		return 0 ;
+		// }) ;
+		var count = 1
+		apiData.resultColumns.forEach(function(column,index){
+			//如果该列未选中
+			if(column.status == false){
+				column.column_index=''
+				return false
+			}
+			column.column_index = count
+			count += 1
+			select_fields.push(column.table_alias+'.'+column.column_name + " as "+ column.column_name_alias)
+			//如果该列指定了排序方式
+			if(column.column_order!=''){
+				order_fields.push(column.table_alias+'.'+column.column_name +" "+ column.column_order)  
+			}
+			//如果该列设置了查询类型
+			if(column.column_query_type!=''){
+				//将between转换为 < >
+				if(column.column_query_type=='between'){
+					where_fields.push(column.table_alias+'.'+column.column_name + " >  @"+ column.column_name_alias)
+					apiData.whereConditions[column.column_name_alias] = {column:column.table_alias+'.'+column.column_name,
+																		name:column.column_name_cn+"自",
+																		opt:'>',default_value:column.default_value}
+					//apiData.whereConditions.push({column:column.column_name_alias,name:column.column_name_cn+"自",opt:'>'})
+					where_fields.push(column.table_alias+'.'+column.column_name + " <  @"+ column.column_name_alias+"2")
+					//apiData.whereConditions.push({column:column.column_name_alias+"2",name:column.column_name_cn+"至",opt:'<'})
+					apiData.whereConditions[column.column_name_alias+"2"] = {column:column.table_alias+'.'+column.column_name,
+																		name:column.column_name_cn+"至",
+																		opt:'<',default_value:column.default_value}
+				}
+				else{
+					//a.code = @a_code
+					where_fields.push(column.table_alias+'.'+column.column_name + " " + column.column_query_type +" @"+ column.column_name_alias)
+					apiData.whereConditions[column.column_name_alias] = {column:column.table_alias+'.'+column.column_name,
+																		name:column.column_name_cn,
+																		opt:column.column_query_type,default_value:column.default_value}
+					//apiData.whereConditions.push({column:column.column_name_alias,name:column.column_name_cn,opt:column.column_query_type})
+				}
+				
+			}
+			//console.log('name_cn==='+ (column.column_name_cn==""))
+			header_title = column.column_name_cn != "" ? column.column_name_cn:column.column_name 
+			//console.log('header_title==='+header_title)
+			apiData.resultHeaders.push({title:header_title,data:column.column_name_alias})
+			//table_headers = column.column_name_cn
+		})
+		//组装要查询的字段
+		sql +=	select_fields.join(',')
+		sql +=	" from "
+		sql += apiData.tables_info[0].name + " as " + apiData.tables_info[0].alias
+		//组装表连接条件
+		// apiData.tableJoins.forEach(function(join,index){
+		// 	if(join['left_table'] == ''){
+		// 		return false
+		// 	}
+		// 	left_table_alias = apiData.selectTableInfo[join['left_table']]['alias']
+		// 	if(index == 0){
+		// 		sql += join['left_table'] + " as " + left_table_alias
+		// 	}
+		// 	if(join['right_table'] == ''){
+		// 		return false
+		// 	}
+		// 	right_table_alias = apiData.selectTableInfo[join['right_table']]['alias']
+		// 	if(join['join_type'] != ''){
+		// 		sql += " "+join['join_type'] + " "+
+		// 				join['right_table'] + " as " + 
+		// 				right_table_alias
+		// 		sql += " on "+ left_table_alias+"."+join['left_column'] +
+		// 				" = "+ right_table_alias+"."+join['right_column']
+		// 	}
+			
+		// })
+		// gensql 只包含查询字段和查询表，连接条件，
+		// 不包含where条件，由后台根据查询参数动态组装，避免参数传空问题
+		//组装查询条件
+		//sql += " $condition "
+		if(where_fields.length > 0){
+			sql += ' where '+  where_fields.join(' and ')
+		}
+		apiData.genSql = sql 
+		
+		apiData.addSql = ''
+		//组装排序条件
+		if(order_fields.length>0){
+			sql += " order by " + order_fields.join(',')
+			apiData.addSql += " order by " + order_fields.join(',')
+		}
+		//数据变化时，实时调整表格表头,给空数据列表
+		rebuildTable([])
+
+		return sql
+	}
+ 
+
+	function rebuildTable(data){
+		if(apiData.resultHeaders.length<1){
+			return;
+		}
+		if(data_table != null){
+			//销毁对象
+			data_table.destroy()
+			//清空dom
+			$('#test-result').empty()
+		}
+		//复制resultHeaders对象，不然会被DataTable修改，添加额外信息
+		var result_headers = $.extend(true, [], apiData.resultHeaders);
+		data_table = $('#test-result').DataTable( {
+				destroy: true,
+				ordering:false,
+				paging: false,
+				lengthChange: false,
+				pageLength: 10,
+				searching:false,
+				data: data,
+				scrollX:true,//水平滚动
+				autoWidth:true,
+				columns:  result_headers,
+				language:datatable_language
+		});
+	}
+
+	</script>
+
+	<script>
+	var apiData ={
+			id:0,
+			name:'查询xx信息接口',
+			path:'',
+			comment:'查询xx信息接口',
+			type:'query',
+			//所有的表，不需要存储
+			all_tables:[],
+			//已选中的表
+			tables_info:[{name:'表名',nameCN:'',alias:''}],
+			selectTableInfo:{},
+			//已选中的表对应的列，不需要存储
+			select_table_columns:{},
+			//select_fields:[],
+			//表连接
+			tableJoins:[{left_table:'',left_column:'',join_type:'',right_table:'',right_column:''}],
+			
+			//tableJoins:[{left_table:'t_score',left_column:'student_code',join_type:'inner join',right_table:'t_student',right_column:'code'},
+			//			{left_table:'t_score',left_column:'course_code',join_type:'inner join',right_table:'t_course',right_column:'code'}],
+			//查询条件数组
+			whereConditions:{},
+			//查询结果配置
+			resultColumns:[],
+			//查询结果表头
+			resultHeaders: [],
+			//table_name:'t_course',
+			//test_arr : { 't_course':[ 'a','b','c']},
+			genSql:'select ',
+			addSql:""
+	}
+	
+	var app = new Vue({
+		el: '#app',
+		data: apiData,
+
+		mounted:function(){
+			apiId = getUrlParam("id")
+			if( typeof apiId != "undefined" && apiId != null ){
+				apiData.id =  apiId
+				$.ajax({
+					type:"get",
+					url:"api-gen/getApi",
+					data:{apiId:apiId},
+					success:function(ret){
+						console.log(ret)
+						if(ret.code==CODE_SUCCESS){
+							result = ret.data
+							result['tableJoins'] = $.parseJSON(result['tableJoins'])
+							result['selectTableInfo'] = $.parseJSON(result['selectTableInfo'])
+							result['whereConditions'] = $.parseJSON(result['whereConditions'])
+							result['resultColumns'] = $.parseJSON(result['resultColumns'])
+							result['resultHeaders'] = $.parseJSON(result['resultHeaders'])
+							$.extend(apiData,result)
+							// $.each()
+							// for (let key of Object.keys(result['selectTableInfo'])) {
+							// 	//select_tables.push(key)
+							// 	apiData.tables_info.push({name:key,nameCN:item.name_cn,alias:item.alias});
+							// }
+							apiData.tables_info = []
+							$.each(result['selectTableInfo'],function(key,value){
+								//回显已选择的表格
+								apiData.tables_info.push({name:key,name_cn:value.name_cn,alias:value.alias});
+							})
+							
+							$('#api_name').attr("readonly","readonly")
+
+							
+						}
+					}
+				})
+			}
+			
+
+
+			console.log('===vue mounted, load all tables=====')
+			$.get('table/getTableNames',function(data){
+				console.log(JSON.stringify(data))
+				apiData.all_tables = data;
+
+			},'json')
+
+			
+		},
+		methods:{
+			//添加一个表
+			addTable:function(){
+				app.tables_info.push({name:'',name_cn:'',alias:''})
+				// app.selectTableInfo['请选择'] = {nameCN:'',alias:''}
+			},
+
+
+			
+			delTable:function(index){
+				console.log("index==="+index)
+				apiData.tables_info.splice(index,1);
+			},
+
+			//加载已选择的表
+			loadSelectTables:function(){
+				select_tables = []
+				// for (let key of Object.keys(apiData.selectTableInfo)) {
+				// 	select_tables.push(key)
+				// }
+				// debugger
+				apiData.tables_info.forEach(function(item,index){
+					select_tables.push(item.name)
+				})
+				$.ajax({
+					type:"post",
+					url:"table/getTableByNames",
+					traditional:true,
+					data:{tableNames:select_tables},
+					success:function(ret){
+						console.log(ret)
+						if(ret.code == CODE_SUCCESS && ret.data.length > 0){
+							count = 1//排序计数
+							//清空已选中数据表
+							apiData.selectTableInfo = {}
+							apiData.tables_info = []
+							apiData.tableJoins = []
+							apiData.resultColumns = []
+							//赋值已选的表数据
+							apiData.select_table_columns = {}
+							tableDatas = ret.data
+							all_columns = [] // 存放所有的列名，判断重复用
+							tableDatas.forEach(function(table,index){
+								table_alias = String.fromCharCode(97+index)
+								apiData.selectTableInfo[table.name] = {'name_cn':table.nameCN,'alias':table_alias}
+								apiData.tables_info.push({'name':table.name,'name_cn':table.nameCN,'alias':table_alias})
+								//table_aliases[table.name] = table_alias
+								//预置连接条件，将第一个表作为主表
+								apiData.tableJoins.push({left_table:tableDatas[0].name,left_column:'',join_type:'inner join',right_table:'',right_column:''})
+								apiData.select_table_columns[table.name] = table.columns
+
+								table.columns.forEach(function(column,idx){
+									if (all_columns.includes(column.name)){
+										//判断有重复的字段，增加表名和下划线
+										column_name_alias = table_alias+'_'+column.name
+									}
+									else{
+										column_name_alias = column.name
+									}
+									all_columns.push(column.name)
+									result_column = {	status:true,
+														table_name:table.name,
+														table_alias:table_alias,
+														column_name:column.name,
+														column_name_cn:column.nameCN,
+														column_name_alias:column_name_alias,
+														//column_type:'text',
+														column_index:count,
+														column_order:'',
+														column_query_type:'',
+														default_value:'',
+														column_format:''
+														// column_test_value:'',
+														// column_test_value2:''
+													}
+									apiData.resultColumns.push(result_column) 
+									count += 1
+								})
+							})
+						}
+						else{
+							console.log('加载失败'+select_tables)
+						}
+					}
+				})
+			},
+
+			addJoin:function(){
+				apiData.tableJoins.push({left_table:'',left_column:'',join_type:'',right_table:'',right_column:''})
+			},
+
+
+			
+			delTableJoin:function(index){
+				console.log("index==="+index)
+				apiData.tableJoins.splice(index,1);
+			},
+
+			createApi:function(){
+				if(apiData.name=="" || apiData.path==""){
+					alert("api名称和地址必填")
+					return
+				}
+				//复制apiData对象到params
+				var params = $.extend(true, {}, apiData);
+				delete params["all_tables"]
+				delete params["select_table_columns"]
+
+				params['selectTableInfo'] = JSON.stringify(params['selectTableInfo'])
+				params['tableJoins'] = JSON.stringify(params['tableJoins'])
+				params['whereConditions'] = JSON.stringify(params['whereConditions'])
+				params['resultColumns'] = JSON.stringify(params['resultColumns'])
+				params['resultHeaders'] = JSON.stringify(params['resultHeaders'])
+				$.ajax({
+					type:'post',
+					url:'api-gen/createApi',
+					data:JSON.stringify(params),
+					contentType:"application/json;charset=UTF-8",
+					success:function(ret){
+						//console.log(ret);
+						if(ret.code==CODE_SUCCESS){
+							apiData.id = ret.data;
+							alert('保存api成功')
+							$('#api_name').attr("readonly","readonly")
+						}
+						else{
+							alert('保存api失败：'+ret.msg)
+						}
+					},
+					error:function () {
+						alert('发生错误：')
+					}
+				});
+			},
+
+			queryTest:function()  {
+				//组装查询条件
+				jsonParams = {}
+				$.each(apiData.whereConditions, function(key, val) {  
+					//筛选不为空的条件
+					if(typeof val.value != "undefined" && val.value != ''){
+						var input_value = val.value
+						if (val.opt=='like'){
+							jsonParams[key] = "%"+input_value+"%"
+						}
+						else if (val.opt=='left_like'){
+							jsonParams[key] = "%"+input_value
+						}
+						else if (val.opt=='right_like'){
+							jsonParams[key] = input_value+"%"
+						}
+						else{
+							jsonParams[key] = input_value
+						}
+					}
+				});  
+				
+				var params = {	genSql:this.genSql, 
+								addSql:this.addSql,
+								whereConditions: JSON.stringify(apiData.whereConditions),
+								jsonParam:JSON.stringify(jsonParams)
+							 }
+				$.ajax({
+					type:'post',
+					url:'api-gen/queryList',
+					data:params,
+					success:function(ret){
+						console.log(ret);
+						rebuildTable(ret)
+						// if(data_table != null){
+						// 	//销毁对象
+						// 	data_table.destroy()
+						// 	//清空dom
+						// 	$('#test-result').empty()
+						// }
+						// //复制resultHeaders对象，不然会被DataTable修改，添加额外信息
+						// var result_headers = $.extend(true, [], apiData.resultHeaders);
+						// data_table = $('#test-result').DataTable( {
+						// 		destroy: true,
+						// 		ordering:false,
+						// 		paging: false,
+						// 		searching:false,
+						// 		data: ret,
+						// 		scrollX: true,
+						// 		autoWidth:true,
+						// 		columns:  result_headers
+						// });
+					},
+					error:function () {
+						alert('发生错误：')
+					}
+				});
+			},
+			genQueryFormHtml:function(){
+				var htmlOrig = $("#queryForm").html()
+				var formatSrc = $.htmlClean(htmlOrig, {
+								format: true,
+								allowedAttributes: [
+									["id"],
+									["class"],
+									["data-toggle"],
+									["data-target"],
+									["data-parent"],
+									["role"],
+									["data-dismiss"],
+									["aria-labelledby"],
+									["aria-hidden"],
+									["data-slide-to"],
+									["data-slide"]
+								]
+							});
+				console.log(htmlOrig)
+				console.log(formatSrc)
+				$('#querFromHtml').val(formatSrc)
+				$('#myModal').modal('show')
+			}
+		},
+		computed:{
+			//自动计算组装的sql
+			sql:function(){
+				genSql = buildSql()
+				return genSql
+			},
+			host:function(){
+				return window.location.hostname +':'+ window.location.port
+			},
+			resultJson: function(){
+				var jsonObj = {code:'状态码：200表示成功',
+								msg:'服务端返回信息',
+								recordsTotal:'数据总条数',
+								data:[]
+								}
+				var dataObj = {}
+				apiData.resultHeaders.forEach(function(value,index){
+					var column_name = value.data
+					var column_namen_cn = value.title
+					dataObj[column_name]=column_namen_cn
+				})
+				jsonObj.data.push(dataObj)
+				return JSON.stringify(jsonObj, null, 2)
+			}
+		}
+	})
+</script>
+</body>
+</html>
